@@ -1,0 +1,26 @@
+using UnityEngine;
+
+public class Heart : Item
+{
+    protected override void PickUp(Collider2D collision)
+    {
+        CharacterLife playerLife = collision.GetComponent<CharacterLife>();
+
+        if (playerLife.health >= playerLife.maxHealth) return;
+
+        animator.SetTrigger("PickUp");
+
+        playerLife.Heal(3);
+
+        pickUpSound.Play();
+
+        isPickingUp = true;
+
+        OnPickUpCompleted();
+    }
+
+    protected override void OnPickUpCompleted()
+    {
+        Destroy(gameObject, 3);
+    }
+}

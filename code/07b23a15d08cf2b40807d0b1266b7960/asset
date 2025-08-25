@@ -1,0 +1,76 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+[RequireComponent(typeof(Animator), typeof(CharacterGroundCheck), typeof(CharacterState))]
+public class CharacterAttack : MonoBehaviour
+{
+    Animator animator;
+    CharacterGroundCheck characterGroundCheck;
+    CharacterState characterState;
+
+    [SerializeField] int damage = 3;
+    [SerializeField] float attackDelay = 0.5f;
+
+    [Space(20)]
+    [SerializeField] Transform attackCheck;
+    [SerializeField] float radius = 1f;
+    [SerializeField] LayerMask attackLayer;
+
+    [Space(20)]
+    [SerializeField] AudioSource attackSound;
+
+    bool isAttacking;
+
+    void Start()
+    {
+        animator = GetComponent<Animator>();
+        characterGroundCheck = GetComponent<CharacterGroundCheck>();
+        characterState = GetComponent<CharacterState>();
+
+        isAttacking = false;
+    }
+
+    public void Attack()
+    {
+        if (isAttacking
+        || !characterGroundCheck.IsGrounded()
+        || characterState.IsState(CharacterState.State.TakingDamage)
+        || characterState.IsState(CharacterState.State.Dead))
+            return;
+
+        animator.SetTrigger("Attack");
+        isAttacking = true;
+
+        characterState.ChangeState(CharacterState.State.Attacking);
+
+        StartCoroutine(AttackDelay());
+    }
+
+    void Damage()
+    {
+        Collider2D[] collisions = Physics2D.OverlapCircleAll(attackCheck.position, radius, attackLayer);
+
+        foreach (Collider2D collision in collisions)
+        {
+            collision.GetComponent<Life>().TakeDamage(damage);
+        }
+
+        attackSound.Play();
+    }
+
+    IEnumerator AttackDelay()
+    {
+        yield return new WaitForSeconds(attackDelay);
+
+        isAttacking = false;
+
+        characterState.ChangeState(CharacterState.State.Normal);
+    }
+
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(attackCheck.position, radius);
+    }
+}

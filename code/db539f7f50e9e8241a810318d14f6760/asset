@@ -1,0 +1,19 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class ApplicationController : MonoBehaviour
+{
+    [SerializeField] int startTimeScale = 1;
+
+    void Start()
+    {
+        Time.timeScale = startTimeScale;
+        Application.targetFrameRate = 100;
+    }
+
+    public void SetTimeScale(int timeScale)
+    {
+        Time.timeScale = timeScale;
+    }
+}

@@ -1,0 +1,53 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+[RequireComponent(typeof(Animator), typeof(CharacterState))]
+public class CharacterLife : Life
+{
+    public event LifeHandler OnDieCompleted;
+
+    Animator animator;
+    CharacterState characterState;
+
+    [Space(20)]
+    [SerializeField] AudioSource hurtSound;
+
+    protected override void Start()
+    {
+        base.Start();
+
+        animator = GetComponent<Animator>();
+        characterState = GetComponent<CharacterState>();
+    }
+
+    protected override void TakeDamageEffect()
+    {
+        animator.SetTrigger("Hurt");
+
+        hurtSound.Play();
+
+        characterState.ChangeState(CharacterState.State.TakingDamage);
+    }
+
+    protected override IEnumerator TakeDamageDelay()
+    {
+        yield return StartCoroutine(base.TakeDamageDelay());
+
+        characterState.ChangeState(CharacterState.State.Normal);
+    }
+
+    protected override void Die()
+    {
+        animator.SetTrigger("Death");
+
+        hurtSound.Play();
+
+        characterState.ChangeState(CharacterState.State.Dead);
+    }
+
+    protected override void OnDeathComplete()
+    {
+        OnDieCompleted?.Invoke();
+    }
+}

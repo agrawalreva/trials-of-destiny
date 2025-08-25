@@ -1,0 +1,33 @@
+using System.Collections;
+using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
+
+public class ScoreText : MonoBehaviour
+{
+    [SerializeField] ScoreManager scoreManager;
+
+    TextMeshProUGUI scoreText;
+
+    void Start()
+    {
+        scoreText = GetComponent<TextMeshProUGUI>();
+
+        scoreText.text = $"SCORE: {scoreManager.GetScore()}";
+    }
+
+    void OnEnable()
+    {
+        scoreManager.OnScoreUpdated += UpdateScoreText;
+    }
+
+    void OnDisable()
+    {
+        scoreManager.OnScoreUpdated -= UpdateScoreText;
+    }
+
+    void UpdateScoreText(int score)
+    {
+        scoreText.text = $"SCORE: {score}";
+    }
+}

@@ -1,0 +1,27 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class EnemyLife : CharacterLife
+{
+    bool isDead;
+
+    protected override void Start()
+    {
+        base.Start();
+
+        isDead = false;
+    }
+
+    protected override void OnDeathComplete()
+    {
+        ScoreManager.Instance.UpdateScore();
+
+        isDead = true;
+    }
+
+    void OnBecameInvisible()
+    {
+        if (isDead) Destroy(gameObject);
+    }
+}

@@ -1,0 +1,37 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class EndLevel : MonoBehaviour
+{
+    public delegate void EndLevelHandler();
+    public EndLevelHandler OnLevelFinished;
+
+    [SerializeField] Transform flag;
+
+    bool isLevelFinished;
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Player") && !isLevelFinished)
+        {
+            StartCoroutine(FinishLevel());
+        }
+    }
+
+    void Update()
+    {
+        if (flag.transform.localPosition.y <= -1.25f || !isLevelFinished) return;
+
+        flag.transform.localPosition += Vector3.down * 2f * Time.deltaTime;
+    }
+
+    IEnumerator FinishLevel()
+    {
+        isLevelFinished = true;
+
+        yield return new WaitForSeconds(3);
+
+        OnLevelFinished?.Invoke();
+    }
+}

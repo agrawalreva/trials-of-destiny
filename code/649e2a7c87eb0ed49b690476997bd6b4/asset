@@ -1,0 +1,32 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class CharacterState : MonoBehaviour
+{
+    public enum State
+    {
+        Normal,
+        Attacking,
+        TakingDamage,
+        Dead
+    }
+    State currentState;
+
+    void Start()
+    {
+        currentState = State.Normal;
+    }
+
+    public void ChangeState(State newState)
+    {
+        if (currentState == newState || currentState == State.Dead) return;
+
+        currentState = newState;
+    }
+
+    public bool IsState(State state)
+    {
+        return currentState == state;
+    }
+}

@@ -1,0 +1,54 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+[RequireComponent(typeof(Rigidbody2D), typeof(CharacterState))]
+public class CharacterMovement : MonoBehaviour
+{
+    public delegate void DirectionHandler(float directionX);
+    public event DirectionHandler OnDirectionChanged;
+
+    Rigidbody2D rb;
+    CharacterState characterState;
+
+    [SerializeField] float speed = 6f;
+
+    float directionX;
+
+    void Start()
+    {
+        rb = GetComponent<Rigidbody2D>();
+        characterState = GetComponent<CharacterState>();
+    }
+
+    void FixedUpdate()
+    {
+        if (characterState.IsState(CharacterState.State.Dead)
+        || characterState.IsState(CharacterState.State.TakingDamage)
+        || characterState.IsState(CharacterState.State.Attacking))
+        {
+            Stop();
+
+            return;
+        }
+
+        Move();
+    }
+
+    void Move()
+    {
+        rb.velocity = new Vector2(directionX * speed, rb.velocity.y);
+    }
+
+    public void SetDirection(float directionX)
+    {
+        this.directionX = directionX;
+
+        OnDirectionChanged?.Invoke(directionX);
+    }
+
+    public void Stop()
+    {
+        rb.velocity = new Vector2(0, rb.velocity.y);
+    }
+}

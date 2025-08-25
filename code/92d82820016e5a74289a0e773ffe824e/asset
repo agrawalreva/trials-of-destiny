@@ -1,0 +1,24 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+[RequireComponent(typeof(CharacterJump))]
+public class PlayerAnimationsManager : CharacterAnimationsManager
+{
+    CharacterJump characterJump;
+
+    protected override void Start()
+    {
+        base.Start();
+
+        characterJump = GetComponent<CharacterJump>();
+    }
+
+    protected override void HandleAnimations()
+    {
+        base.HandleAnimations();
+
+        animator.SetBool("IsJumping", characterJump.isJumping);
+        animator.SetBool("IsFalling", characterJump.isFalling);
+    }
+}

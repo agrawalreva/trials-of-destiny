@@ -1,0 +1,10 @@
+using Cinemachine;
+using UnityEngine;
+
+public class CameraManager : MonoBehaviour, IPlayerConfigurable
+{
+    public void SetPlayer(GameObject player)
+    {
+        GetComponent<CinemachineVirtualCamera>().Follow = player.transform;
+    }
+}

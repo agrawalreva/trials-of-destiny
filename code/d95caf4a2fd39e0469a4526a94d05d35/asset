@@ -1,0 +1,85 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public abstract class Life : MonoBehaviour
+{
+    public delegate void LifeHandler();
+    public event LifeHandler OnHealthChanged;
+    public event LifeHandler OnDied;
+    public int health = 10;
+    public int maxHealth { get; private set; }
+
+    [SerializeField] float takeDamageDelay = 0.5f;
+
+    bool isTakingDamage;
+    bool isDying;
+
+    protected virtual void Start()
+    {
+        maxHealth = health;
+
+        isTakingDamage = false;
+        isDying = false;
+    }
+
+    public void TakeDamage(int damage)
+    {
+        if (isTakingDamage || isDying) return;
+
+        health -= damage;
+
+        if (health <= 0)
+        {
+            Die();
+
+            OnDied?.Invoke();
+
+            isDying = true;
+        }
+        else
+        {
+            TakeDamageEffect();
+
+            OnHealthChanged?.Invoke();
+
+            isTakingDamage = true;
+
+            StartCoroutine(TakeDamageDelay());
+        }
+    }
+
+    protected virtual IEnumerator TakeDamageDelay()
+    {
+        yield return new WaitForSeconds(takeDamageDelay);
+
+        isTakingDamage = false;
+    }
+
+    public void Heal(int amount)
+    {
+        if (health >= maxHealth) return;
+
+        if (health + amount >= maxHealth)
+        {
+            health = maxHealth;
+        }
+        else
+        {
+            health += amount;
+        }
+
+        OnHealthChanged?.Invoke();
+    }
+
+    public bool IsAlive()
+    {
+        return !isDying;
+    }
+
+    protected abstract void TakeDamageEffect();
+
+    protected abstract void Die();
+
+    protected abstract void OnDeathComplete();
+}

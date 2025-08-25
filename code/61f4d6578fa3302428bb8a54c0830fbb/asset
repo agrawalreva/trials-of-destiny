@@ -1,0 +1,55 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+[RequireComponent(typeof(CharacterMovement), typeof(CharacterState))]
+public class CharacterFlip : MonoBehaviour
+{
+    CharacterMovement characterMovement;
+    CharacterState characterState;
+
+    float flipDirection;
+
+    void Awake()
+    {
+        characterMovement = GetComponent<CharacterMovement>();
+        characterState = GetComponent<CharacterState>();
+
+        flipDirection = 1;
+    }
+
+    void OnEnable()
+    {
+        characterMovement.OnDirectionChanged += SetFlipDirection;
+    }
+
+    void OnDisable()
+    {
+        characterMovement.OnDirectionChanged -= SetFlipDirection;
+    }
+
+    void Update()
+    {
+        if (characterState.IsState(CharacterState.State.Dead)
+        || characterState.IsState(CharacterState.State.TakingDamage)
+        || characterState.IsState(CharacterState.State.Attacking))
+            return;
+
+        FlipTowards(flipDirection);
+    }
+
+    void SetFlipDirection(float flipDirection)
+    {
+        this.flipDirection = flipDirection;
+    }
+
+    public void FlipTowards(float flipDirection)
+    {
+        if (flipDirection == 0) return;
+
+        transform.localScale = new Vector2(
+            flipDirection > 0 ? 1 : -1,
+            1
+        );
+    }
+}

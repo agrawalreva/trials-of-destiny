@@ -1,0 +1,22 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
+
+public class EndText : MonoBehaviour
+{
+    TextMeshProUGUI endText;
+
+    [SerializeField] CharacterText[] characterTexts;
+
+    void Start()
+    {
+        endText = GetComponent<TextMeshProUGUI>();
+
+        string characterName = CharacterManager.Instance.GetCharacter().GetComponent<CharacterData>().GetCharacterName();
+        string text = Array.Find(characterTexts, characterText => characterText.characterName == characterName).text;
+
+        endText.text = text;
+    }
+}

@@ -1,0 +1,44 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class HealthBar : MonoBehaviour, IPlayerConfigurable
+{
+    Slider healthBar;
+
+    CharacterLife playerLife;
+
+    void Start()
+    {
+        healthBar = GetComponent<Slider>();
+
+        healthBar.maxValue = playerLife.health;
+        healthBar.value = playerLife.health;
+    }
+
+    public void SetPlayer(GameObject player)
+    {
+        playerLife = player.GetComponent<CharacterLife>();
+
+        playerLife.OnHealthChanged += UpdateHealthBar;
+        playerLife.OnDied += UpdateHealthBar;
+    }
+
+    void OnEnable()
+    {
+        if (playerLife != null) playerLife.OnHealthChanged += UpdateHealthBar;
+        if (playerLife != null) playerLife.OnDied += UpdateHealthBar;
+    }
+
+    void OnDisable()
+    {
+        playerLife.OnHealthChanged -= UpdateHealthBar;
+        playerLife.OnDied -= UpdateHealthBar;
+    }
+
+    public void UpdateHealthBar()
+    {
+        healthBar.value = playerLife.health;
+    }
+}

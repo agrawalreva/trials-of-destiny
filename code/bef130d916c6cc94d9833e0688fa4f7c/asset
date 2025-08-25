@@ -1,0 +1,20 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class CharacterGroundCheck : MonoBehaviour
+{
+    [SerializeField] Transform groundCheck;
+    [SerializeField] float radius = 0.25f;
+    [SerializeField] LayerMask groundLayer;
+
+    public bool IsGrounded()
+    {
+        return Physics2D.OverlapCircle(groundCheck.position, radius, groundLayer);
+    }
+
+    void OnDrawGizmos()
+    {
+        Gizmos.DrawWireSphere(groundCheck.position, radius);
+    }
+}

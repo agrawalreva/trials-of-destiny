@@ -1,0 +1,22 @@
+using System.Collections;
+using System.Collections.Generic;
+using Cinemachine;
+using UnityEngine;
+
+public class PlayerSpawner : MonoBehaviour
+{
+    [SerializeField] CameraManager cameraManager;
+    [SerializeField] HealthBar healthBar;
+    [SerializeField] GameManager gameManager;
+
+    void Awake()
+    {
+        GameObject character = CharacterManager.Instance.GetCharacter();
+
+        GameObject player = Instantiate(character, transform.position, Quaternion.identity);
+
+        cameraManager.SetPlayer(player);
+        healthBar.SetPlayer(player);
+        gameManager.SetPlayer(player);
+    }
+}

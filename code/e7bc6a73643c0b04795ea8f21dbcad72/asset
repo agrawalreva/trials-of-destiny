@@ -1,0 +1,46 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class HighScoreManager : MonoBehaviour
+{
+    public static HighScoreManager Instance { get; private set; }
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(Instance);
+        }
+        else
+        {
+            Instance = this;
+        }
+
+        highScore = PlayerPrefs.GetInt("HighScore", 0);
+        characterName = PlayerPrefs.GetString("HighScoreCharacter", "None").ToUpper();
+    }
+
+    int highScore;
+    string characterName;
+
+    public int GetHighScore()
+    {
+        return highScore;
+    }
+
+    public string GetHighScoreCharacter()
+    {
+        return characterName;
+    }
+
+    public void SetHighScore(int highScore)
+    {
+        PlayerPrefs.SetInt("HighScore", highScore);
+    }
+
+    public void SetHighScoreCharacter(string characterName)
+    {
+        PlayerPrefs.SetString("HighScoreCharacter", characterName);
+    }
+}

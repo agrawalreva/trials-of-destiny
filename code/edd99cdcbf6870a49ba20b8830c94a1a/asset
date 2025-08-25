@@ -1,0 +1,95 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+[RequireComponent(typeof(Rigidbody2D), typeof(CharacterGroundCheck), typeof(CharacterState))]
+public class CharacterJump : MonoBehaviour
+{
+    Rigidbody2D rb;
+    CharacterGroundCheck characterGroundCheck;
+    CharacterState characterState;
+
+    [SerializeField] float jumpForce = 13f;
+
+    [Space(20)]
+    [SerializeField] float coyoteTime = 0.2f;
+    float coyoteTimer;
+
+    [Space(20)]
+    [SerializeField] float fallMultiplier = 3f;
+
+    [Space(20)]
+    [SerializeField] AudioSource jumpSound;
+
+    Vector2 gravity;
+
+    public bool isJumping;
+    public bool isFalling;
+
+
+    void Start()
+    {
+        rb = GetComponent<Rigidbody2D>();
+        characterGroundCheck = GetComponent<CharacterGroundCheck>();
+        characterState = GetComponent<CharacterState>();
+
+        coyoteTimer = coyoteTime;
+
+        gravity = new Vector2(0, -Physics2D.gravity.y);
+
+        isJumping = false;
+        isFalling = false;
+    }
+    void Update()
+    {
+        HandleCoyote();
+        HandleFall();
+    }
+
+    void HandleCoyote()
+    {
+        if (characterGroundCheck.IsGrounded())
+        {
+            coyoteTimer = coyoteTime;
+        }
+        else
+        {
+            coyoteTimer -= Time.deltaTime;
+        }
+    }
+
+    public void Jump()
+    {
+        if (coyoteTimer <= 0
+        || characterState.IsState(CharacterState.State.Dead)
+        || characterState.IsState(CharacterState.State.TakingDamage)
+        || characterState.IsState(CharacterState.State.Attacking))
+            return;
+
+        rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+
+        jumpSound.Play();
+
+        isJumping = true;
+    }
+
+    public void ReleaseJump()
+    {
+        coyoteTimer = 0;
+    }
+
+    void HandleFall()
+    {
+        if (rb.velocity.y < 0 && !characterGroundCheck.IsGrounded())
+        {
+            isJumping = false;
+            isFalling = true;
+
+            rb.velocity -= gravity * fallMultiplier * Time.deltaTime;
+        }
+        else
+        {
+            isFalling = false;
+        }
+    }
+}

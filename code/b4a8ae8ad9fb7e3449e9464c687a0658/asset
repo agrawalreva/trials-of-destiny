@@ -1,0 +1,77 @@
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+public class GameManager : MonoBehaviour, IPlayerConfigurable
+{
+    CharacterLife playerLife;
+    CharacterData playerData;
+
+    [SerializeField] EndLevel endLevel;
+
+    [Space(20)]
+    [SerializeField] GameObject playerPanel;
+    [SerializeField] GameObject gameoverPanel;
+    [SerializeField] GameObject victoryPanel;
+
+    [Space(20)]
+    [SerializeField] AudioSource backgroundMusic;
+    [SerializeField] AudioSource gameoverMusic;
+    [SerializeField] AudioSource victoryMusic;
+
+    public void SetPlayer(GameObject player)
+    {
+        playerLife = player.GetComponent<CharacterLife>();
+        playerData = player.GetComponent<CharacterData>();
+
+        playerLife.OnDieCompleted += Gameover;
+    }
+
+    void OnEnable()
+    {
+        if (playerLife != null) playerLife.OnDieCompleted -= Gameover;
+
+        endLevel.OnLevelFinished += Victory;
+    }
+
+    void OnDisable()
+    {
+        if (playerLife != null) playerLife.OnDied -= Gameover;
+
+        endLevel.OnLevelFinished -= Victory;
+    }
+
+    void Gameover()
+    {
+        Time.timeScale = 0;
+
+        backgroundMusic.Stop();
+        gameoverMusic.Play();
+
+        playerPanel.SetActive(false);
+        gameoverPanel.SetActive(true);
+
+        UpdateHighScore();
+    }
+
+    void Victory()
+    {
+        Time.timeScale = 0;
+
+        backgroundMusic.Stop();
+        victoryMusic.Play();
+
+        playerPanel.SetActive(false);
+        victoryPanel.SetActive(true);
+
+        UpdateHighScore();
+    }
+
+    void UpdateHighScore()
+    {
+        if (ScoreManager.Instance.GetScore() > HighScoreManager.Instance.GetHighScore())
+        {
+            HighScoreManager.Instance.SetHighScore(ScoreManager.Instance.GetScore());
+            HighScoreManager.Instance.SetHighScoreCharacter(playerData.GetCharacterName());
+        }
+    }
+}

@@ -1,0 +1,40 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+[RequireComponent(typeof(PathFollower), typeof(CharacterAttack), typeof(CharacterFlip))]
+[RequireComponent(typeof(CharacterState))]
+public class EnemyController : MonoBehaviour
+{
+    PathFollower pathFollower;
+    CharacterAttack characterAttack;
+    CharacterFlip characterFlip;
+    CharacterState characterState;
+
+    Transform player;
+    CharacterLife playerLife;
+
+    void Start()
+    {
+        pathFollower = GetComponent<PathFollower>();
+        characterAttack = GetComponent<CharacterAttack>();
+        characterFlip = GetComponent<CharacterFlip>();
+        characterState = GetComponent<CharacterState>();
+
+        player = GameObject.FindGameObjectWithTag("Player").transform;
+        playerLife = player.GetComponent<CharacterLife>();
+    }
+
+    void Update()
+    {
+        if (characterState.IsState(CharacterState.State.Dead)) return;
+
+        pathFollower.FollowPath();
+
+        if (Vector2.Distance(player.position, transform.position) < 1.5f && playerLife.IsAlive())
+        {
+            characterFlip.FlipTowards(player.position.x - transform.position.x);
+            characterAttack.Attack();
+        }
+    }
+}

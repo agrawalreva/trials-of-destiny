@@ -1,0 +1,93 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+[RequireComponent(typeof(CharacterMovement))]
+public class PathFollower : MonoBehaviour
+{
+    CharacterMovement characterMovement;
+
+    [SerializeField] Transform path;
+    List<Vector2> waypoints;
+
+    [Space(20)]
+    [SerializeField] float waitTime = 1f;
+
+    Transform paths;
+
+    int waypointIndex;
+
+    bool isWaiting;
+    bool isComingBack;
+
+    void Start()
+    {
+        characterMovement = GetComponent<CharacterMovement>();
+
+        paths = GameObject.FindGameObjectWithTag("Paths").transform;
+
+        waypoints = new List<Vector2>();
+
+        for (int i = 0; i < path.childCount; i++)
+        {
+            waypoints.Add(path.GetChild(i).transform.position);
+        }
+
+        path.transform.parent = paths;
+
+        waypointIndex = 0;
+
+        isWaiting = false;
+        isComingBack = false;
+    }
+
+    public void FollowPath()
+    {
+        if (isWaiting) return;
+
+        Vector2 direction = new Vector2(waypoints[waypointIndex].x - transform.position.x, 0).normalized;
+
+        characterMovement.SetDirection(direction.x);
+
+        if (Mathf.Abs(transform.position.x - waypoints[waypointIndex].x) < 0.1f)
+        {
+            if (waypointIndex <= waypoints.Count && !isComingBack)
+            {
+                waypointIndex++;
+
+                if (waypointIndex >= waypoints.Count)
+                {
+                    waypointIndex--;
+
+                    isComingBack = true;
+
+                    StartCoroutine(Wait());
+                }
+            }
+            else
+            {
+                waypointIndex--;
+
+                if (waypointIndex <= -1)
+                {
+                    waypointIndex++;
+
+                    isComingBack = false;
+
+                    StartCoroutine(Wait());
+                }
+            }
+        }
+    }
+
+    IEnumerator Wait()
+    {
+        isWaiting = true;
+        characterMovement.SetDirection(0);
+        characterMovement.Stop();
+
+        yield return new WaitForSeconds(waitTime);
+
+        isWaiting = false;
+    }
+}
